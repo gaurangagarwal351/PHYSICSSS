@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>PHYSICSSS</title>
 
 <!-- ══════════════════════════════════════════════════════
@@ -22,21 +22,52 @@
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#000;display:flex;justify-content:center;align-items:center;min-height:100vh;overflow:hidden;font-family:'Courier New',monospace;touch-action:none;}
-canvas{display:block;cursor:none;max-width:100vw;max-height:100vh;width:auto;height:auto;}
+html,body{
+  background:#000;
+  margin:0;padding:0;
+  width:100%;height:100%;
+  overflow:hidden;
+  font-family:'Courier New',monospace;
+  touch-action:none;
+  -webkit-user-select:none;user-select:none;
+}
+body{
+  display:flex;justify-content:center;align-items:center;
+  background:#000;
+}
+/* The canvas always renders at 860×520 internally.
+   A CSS wrapper scales it to fill the actual screen without
+   distorting aspect ratio. */
+#canvasWrap{
+  position:relative;
+  /* will be sized by JS */
+}
+canvas{
+  display:block;
+  cursor:none;
+  /* width/height set by JS — canvas draws at 860×520 */
+}
 
 /* ── Portrait warning ── */
-#portraitWarn{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
+#portraitWarn{
+  display:none;
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  background:#000;z-index:999;
+  flex-direction:column;align-items:center;justify-content:center;gap:16px;
+}
 #portraitWarn .pw-icon{font-size:56px;animation:spin90 1.2s ease-in-out infinite alternate;}
-#portraitWarn .pw-text{color:#00ff88;font-family:'Courier New',monospace;font-size:13px;letter-spacing:3px;text-align:center;line-height:1.8;}
+#portraitWarn .pw-text{color:#00ff88;font-family:'Courier New',monospace;font-size:14px;letter-spacing:3px;text-align:center;line-height:2;}
 @keyframes spin90{from{transform:rotate(0deg)}to{transform:rotate(90deg)}}
-@media(orientation:portrait){#portraitWarn{display:flex;}}
 
 /* ── On-screen controls (mobile only) ── */
 #mobileControls{
-  display:none;position:fixed;bottom:0;left:0;width:100%;
-  padding:8px 12px 12px;pointer-events:none;z-index:30;
+  display:none;
+  position:absolute;bottom:0;left:0;width:100%;
+  padding:8px 12px 14px;
+  pointer-events:none;z-index:30;
   justify-content:space-between;align-items:flex-end;
+  /* safe area for notched phones */
+  padding-bottom:max(14px,env(safe-area-inset-bottom));
 }
 .mc-left{display:flex;gap:8px;}
 .mc-btn{
@@ -128,7 +159,7 @@ canvas{display:block;cursor:none;max-width:100vw;max-height:100vh;width:auto;hei
   ⚠ Firebase not configured — replace YOUR-PROJECT in the databaseURL inside the &lt;script&gt; tag to enable multiplayer
 </div>
 
-<canvas id="c"></canvas>
+<div id="canvasWrap"><canvas id="c"></canvas>
 
 <!-- Portrait mode warning -->
 <div id="portraitWarn">
@@ -220,12 +251,63 @@ canvas{display:block;cursor:none;max-width:100vw;max-height:100vh;width:auto;hei
 })();
 
 // ═══════════════════════════════════════════════════════════════
-//  CANVAS
+//  CANVAS — fixed 860×520 internal, CSS-scaled to fill screen
 // ═══════════════════════════════════════════════════════════════
 const canvas=document.getElementById('c');
 const ctx=canvas.getContext('2d');
-const W=canvas.width=Math.min(window.innerWidth||860,860);
+const W=canvas.width=860;   // always render at 860×520 internally
 const H=canvas.height=520;
+
+const canvasWrap=document.getElementById('canvasWrap');
+const portraitWarn=document.getElementById('portraitWarn');
+
+function resizeCanvas(){
+  const vw=window.innerWidth, vh=window.innerHeight;
+  const isPortrait=vw<vh;
+
+  // Show portrait warning on mobile; hide on desktop or landscape
+  const isMobile=vw<=900||('ontouchstart' in window);
+  if(isMobile&&isPortrait){
+    portraitWarn.style.display='flex';
+  } else {
+    portraitWarn.style.display='none';
+  }
+
+  // Scale canvas to fill available screen while keeping 860:520 ratio
+  const scaleX=vw/W, scaleY=vh/H;
+  const scale=Math.min(scaleX,scaleY);
+  const cssW=Math.floor(W*scale);
+  const cssH=Math.floor(H*scale);
+
+  // Set canvas CSS size (not internal resolution)
+  canvas.style.width=cssW+'px';
+  canvas.style.height=cssH+'px';
+
+  // Size the wrapper too so mobile controls sit over canvas
+  canvasWrap.style.width=cssW+'px';
+  canvasWrap.style.height=cssH+'px';
+  canvasWrap.style.position='relative';
+}
+resizeCanvas();
+window.addEventListener('resize',resizeCanvas);
+window.addEventListener('orientationchange',()=>{
+  // Short delay for browser to complete rotation
+  setTimeout(resizeCanvas,120);
+});
+
+// Try to lock orientation to landscape on mobile
+(function tryLockOrientation(){
+  try{
+    const scr=window.screen;
+    if(scr.orientation&&scr.orientation.lock){
+      scr.orientation.lock('landscape').catch(()=>{});
+    } else if(scr.lockOrientation){
+      scr.lockOrientation('landscape');
+    } else if(scr.mozLockOrientation){
+      scr.mozLockOrientation('landscape');
+    }
+  }catch(e){}
+})();
 
 let gameMode=null; // 'story' | 'multiplayer'
 
@@ -1336,7 +1418,9 @@ function handleShopClick(mx,my){
 }
 let touchSX=0;
 canvas.addEventListener('touchstart',e=>{
-  touchSX=e.touches[0].clientX;const r=canvas.getBoundingClientRect();const mx=(e.touches[0].clientX-r.left)*(W/r.width),my=(e.touches[0].clientY-r.top)*(H/r.height);
+  touchSX=e.touches[0].clientX;
+  const r=canvas.getBoundingClientRect();
+  const mx=(e.touches[0].clientX-r.left)*(W/r.width),my=(e.touches[0].clientY-r.top)*(H/r.height);
   if(state==='modeSelect'){if(mx>=W/2-230&&mx<=W/2-30&&my>=H/2-50&&my<=H/2+60){gameMode='story';state='menu';}else if(mx>=W/2+30&&mx<=W/2+230&&my>=H/2-50&&my<=H/2+60){gameMode='multiplayer';document.getElementById('mpLobby').style.display='flex';showStep('step1');}return;}
   if(state==='menu'){state='levelSelect';return;}
   if(state==='gameover'){state=gameMode==='story'?'levelSelect':'modeSelect';return;}
