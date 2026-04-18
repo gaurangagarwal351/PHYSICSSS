@@ -27,6 +27,7 @@ html,body{
   font-family:'Courier New',monospace;
   touch-action:none;
   -webkit-user-select:none;user-select:none;
+  -webkit-tap-highlight-color:transparent;
   width:100%;height:100%;
 }
 
@@ -59,7 +60,7 @@ html,body{
 }
 
 /* Canvas: sized by JS, never by CSS max-width/height */
-canvas{display:block;cursor:none;}
+canvas{display:block;cursor:none;will-change:transform;image-rendering:auto;}
 
 /* ── On-screen controls ── */
 #mobileControls{
@@ -81,7 +82,8 @@ canvas{display:block;cursor:none;}
   pointer-events:all;
   -webkit-user-select:none;user-select:none;
   touch-action:none;
-  transition:background .1s,border-color .1s;
+  transition:none;
+  -webkit-tap-highlight-color:transparent;
 }
 .mc-btn:active,.mc-btn.pressed{
   background:rgba(0,255,136,0.25);
@@ -798,6 +800,7 @@ function tryJump(){
 //  GAME START / DIE / RESPAWN
 // ═══════════════════════════════════════════════════════════════
 function startLevel(idx){
+  trackStoryGame();
   currentLevelIdx=idx; const lvl=LEVELS[idx];
   state='playing'; score=0; lives=lvl.lives; distance=0; startLives=lvl.lives;
   modeIdx=lvl.modes[0]; bgTransition={alpha:1,from:lvl.modes[0],to:lvl.modes[0]};
@@ -807,6 +810,7 @@ function startLevel(idx){
   initPlatforms(); resetPlayer(false); startMusic();
 }
 function startMpGame(){
+  trackMpGame();
   state='playing'; score=0; lives=999; distance=0;
   mpMatchTimeLeft=mpMatchDuration; mpMatchResult=null;
   modeIdx=0; bgTransition={alpha:1,from:0,to:0}; modeTimer=15;
@@ -1431,7 +1435,8 @@ canvas.addEventListener('touchstart',e=>{
   if(state==='rewards'){const bx=W-130,by=H-38,bw=108,bh=24;if(mx>=bx&&mx<=bx+bw&&my>=by&&my<=by+bh)state='levelSelect';return;}
   if(state==='shop'){handleShopClick(mx,my);return;}
   if(state==='levelSelect'){if(mx>=14&&mx<=134&&my>=H-38&&my<=H-14){state='rewards';return;}if(mx>=142&&mx<=262&&my>=H-38&&my<=H-14){state='shop';return;}for(let i=0;i<10;i++){if(i+1>unlockedLevel)continue;const c=cardRect(i);if(mx>=c.x&&mx<=c.x+c.w&&my>=c.y&&my<=c.y+c.h){startLevel(i);return;}}return;}
-  if(state==='playing') tryJump();
+  // Don't jump from canvas tap when on-screen controls are showing
+  if(state==='playing'&&mcDiv.style.display==='none') tryJump();
 },{passive:true});
 canvas.addEventListener('touchmove',e=>{const dx=e.touches[0].clientX-touchSX;keys['ArrowRight']=dx>20;keys['ArrowLeft']=dx<-20;},{passive:true});
 canvas.addEventListener('touchend',()=>{keys['ArrowLeft']=keys['ArrowRight']=false;},{passive:true});
@@ -1452,20 +1457,30 @@ function updateMobileControls(){
   mcDiv.style.display = shouldShow ? 'flex' : 'none';
 }
 
-// Left button
-btnLeft.addEventListener('touchstart',e=>{e.preventDefault();keys['ArrowLeft']=true;btnLeft.classList.add('pressed');},{passive:false});
-btnLeft.addEventListener('touchend',e=>{e.preventDefault();keys['ArrowLeft']=false;btnLeft.classList.remove('pressed');},{passive:false});
-btnLeft.addEventListener('touchcancel',()=>{keys['ArrowLeft']=false;btnLeft.classList.remove('pressed');});
+// ── Use pointerdown/up for zero-lag buttons ──────────────────
+// pointerdown fires instantly (no 300ms delay, no passive issues)
+function btnPress(btn, onDown, onUp){
+  btn.addEventListener('pointerdown',e=>{
+    e.preventDefault(); btn.setPointerCapture(e.pointerId);
+    btn.classList.add('pressed'); onDown();
+  });
+  btn.addEventListener('pointerup',  e=>{e.preventDefault();btn.classList.remove('pressed');onUp();});
+  btn.addEventListener('pointercancel',()=>{btn.classList.remove('pressed');onUp();});
+  btn.addEventListener('pointerleave', ()=>{btn.classList.remove('pressed');onUp();});
+}
 
-// Right button
-btnRight.addEventListener('touchstart',e=>{e.preventDefault();keys['ArrowRight']=true;btnRight.classList.add('pressed');},{passive:false});
-btnRight.addEventListener('touchend',e=>{e.preventDefault();keys['ArrowRight']=false;btnRight.classList.remove('pressed');},{passive:false});
-btnRight.addEventListener('touchcancel',()=>{keys['ArrowRight']=false;btnRight.classList.remove('pressed');});
-
-// Jump button
-btnJump.addEventListener('touchstart',e=>{e.preventDefault();tryJump();btnJump.classList.add('pressed');},{passive:false});
-btnJump.addEventListener('touchend',e=>{e.preventDefault();btnJump.classList.remove('pressed');},{passive:false});
-btnJump.addEventListener('touchcancel',()=>{btnJump.classList.remove('pressed');});
+btnPress(btnLeft,
+  ()=>{ keys['ArrowLeft']=true; },
+  ()=>{ keys['ArrowLeft']=false; }
+);
+btnPress(btnRight,
+  ()=>{ keys['ArrowRight']=true; },
+  ()=>{ keys['ArrowRight']=false; }
+);
+btnPress(btnJump,
+  ()=>{ tryJump(); },
+  ()=>{}
+);
 
 // ═══════════════════════════════════════════════════════════════
 //  LOBBY UI HANDLERS
@@ -1518,13 +1533,11 @@ let mpRoomPollTimer=null;
 // ═══════════════════════════════════════════════════════════════
 //  MAIN LOOP
 // ═══════════════════════════════════════════════════════════════
-const FRAME_MS=1000/60;
 function loop(ts){
   requestAnimationFrame(loop);
-  const dt=ts-lastTime;
-  if(dt<FRAME_MS-2)return;
+  const dt=Math.min(ts-lastTime,50);
   lastTime=ts;
-  update(Math.min(dt,50));
+  update(dt);
   // Reset critical canvas state at frame start to prevent state leaking between frames
   ctx.shadowBlur=0; ctx.globalAlpha=1; ctx.textAlign='left';
   const m=MODES[modeIdx];
@@ -1559,12 +1572,74 @@ function loop(ts){
   ctx.restore();
 }
 
+
+// ═══════════════════════════════════════════════════════════════
+//  USER STATS  (stored in Firebase under /stats/)
+//  Track: total visits, unique players, games played, mp matches
+// ═══════════════════════════════════════════════════════════════
+
+// Generate or retrieve a persistent anonymous player ID
+function getPlayerId(){
+  let id = localStorage.getItem('physicsss_pid');
+  if(!id){
+    id = 'p_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,8);
+    localStorage.setItem('physicsss_pid', id);
+  }
+  return id;
+}
+
+const PLAYER_ID = getPlayerId();
+
+// Called once on page load — tracks a visit and registers unique player
+async function trackVisit(){
+  try{
+    const today = new Date().toISOString().slice(0,10); // "2025-04-18"
+    const statsRef = db.ref('stats');
+
+    // Increment total visits
+    await statsRef.child('totalVisits').transaction(n=>(n||0)+1);
+
+    // Track this player as "seen today" and ever
+    const playerRef = statsRef.child('players').child(PLAYER_ID);
+    const snap = await playerRef.get();
+    if(!snap.exists()){
+      // Brand new player
+      await statsRef.child('uniquePlayers').transaction(n=>(n||0)+1);
+      await playerRef.set({ firstSeen: today, lastSeen: today, visits: 1 });
+    } else {
+      // Returning player — update lastSeen + visits count
+      await playerRef.update({ lastSeen: today });
+      await playerRef.child('visits').transaction(n=>(n||0)+1);
+    }
+
+    // Daily active users
+    await statsRef.child('dailyActive').child(today).transaction(n=>(n||0)+1);
+
+  }catch(e){ console.warn('Stats trackVisit error:', e); }
+}
+
+// Called when a story level starts
+async function trackStoryGame(){
+  try{
+    await db.ref('stats/storyGamesPlayed').transaction(n=>(n||0)+1);
+  }catch(e){}
+}
+
+// Called when a multiplayer match starts
+async function trackMpGame(){
+  try{
+    await db.ref('stats/mpMatchesPlayed').transaction(n=>(n||0)+1);
+  }catch(e){}
+}
+
 // ═══════════════════════════════════════════════════════════════
 //  BOOT
 // ═══════════════════════════════════════════════════════════════
 loadProgress();
+trackVisit();
 ctx.fillStyle='#030308'; ctx.fillRect(0,0,W,H);
 requestAnimationFrame(ts=>{lastTime=ts; requestAnimationFrame(loop);});
 </script>
 </body>
 </html>
+
