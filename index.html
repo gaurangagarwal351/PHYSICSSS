@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PHYSICSSS</title>
 
 <!-- ══════════════════════════════════════════════════════
@@ -22,52 +22,31 @@
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{
-  background:#000;
-  margin:0;padding:0;
-  width:100%;height:100%;
-  overflow:hidden;
-  font-family:'Courier New',monospace;
-  touch-action:none;
-  -webkit-user-select:none;user-select:none;
-}
-body{
-  display:flex;justify-content:center;align-items:center;
-  background:#000;
-}
-/* The canvas always renders at 860×520 internally.
-   A CSS wrapper scales it to fill the actual screen without
-   distorting aspect ratio. */
-#canvasWrap{
-  position:relative;
-  /* will be sized by JS */
-}
-canvas{
-  display:block;
-  cursor:none;
-  /* width/height set by JS — canvas draws at 860×520 */
-}
+body{background:#000;overflow:hidden;font-family:'Courier New',monospace;touch-action:none;}
+canvas{display:block;cursor:none;max-width:100%;max-height:100%;width:auto;height:auto;}
 
-/* ── Portrait warning ── */
-#portraitWarn{
-  display:none;
-  position:fixed;top:0;left:0;width:100%;height:100%;
-  background:#000;z-index:999;
-  flex-direction:column;align-items:center;justify-content:center;gap:16px;
+/* ── Game wrapper — handles auto-rotate in portrait on mobile ── */
+#gameWrap{
+  position:fixed;top:0;left:0;
+  width:100vw;height:100vh;
+  display:flex;justify-content:center;align-items:center;
+  overflow:hidden;
 }
-#portraitWarn .pw-icon{font-size:56px;animation:spin90 1.2s ease-in-out infinite alternate;}
-#portraitWarn .pw-text{color:#00ff88;font-family:'Courier New',monospace;font-size:14px;letter-spacing:3px;text-align:center;line-height:2;}
-@keyframes spin90{from{transform:rotate(0deg)}to{transform:rotate(90deg)}}
+/* On touch devices in portrait: silently rotate entire game to landscape */
+@media(orientation:portrait)and(pointer:coarse){
+  #gameWrap{
+    top:50%;left:50%;
+    width:100vh;
+    height:100vw;
+    transform:translate(-50%,-50%) rotate(90deg);
+  }
+}
 
 /* ── On-screen controls (mobile only) ── */
 #mobileControls{
-  display:none;
-  position:absolute;bottom:0;left:0;width:100%;
-  padding:8px 12px 14px;
-  pointer-events:none;z-index:30;
+  display:none;position:absolute;bottom:0;left:0;width:100%;
+  padding:8px 12px 12px;pointer-events:none;z-index:30;
   justify-content:space-between;align-items:flex-end;
-  /* safe area for notched phones */
-  padding-bottom:max(14px,env(safe-area-inset-bottom));
 }
 .mc-left{display:flex;gap:8px;}
 .mc-btn{
@@ -83,7 +62,7 @@ canvas{
 
 /* ── Firebase config warning banner ── */
 #fbWarning{
-  position:fixed;top:0;left:0;width:100%;padding:10px;
+  position:absolute;top:0;left:0;width:100%;padding:10px;
   background:#ff330022;border-bottom:1px solid #ff330055;
   color:#ff6644;font-family:'Courier New',monospace;font-size:11px;
   text-align:center;letter-spacing:1px;z-index:99;display:none;
@@ -91,7 +70,7 @@ canvas{
 
 /* ── MP Lobby ── */
 #mpLobby{
-  position:fixed;top:0;left:0;width:100%;height:100%;
+  position:absolute;top:0;left:0;width:100%;height:100%;
   background:radial-gradient(ellipse at 50% 30%,#001020 0%,#000508 55%,#000010 100%);
   display:none;flex-direction:column;align-items:center;justify-content:center;
   z-index:20;gap:10px;overflow-y:auto;padding:16px 0;
@@ -108,7 +87,7 @@ canvas{
   font-size:15px;padding:9px 14px;width:min(300px,88vw);outline:none;letter-spacing:1px;caret-color:#00ff88;transition:border-color .2s,box-shadow .2s;}
 .lob-input:focus{border-color:#00ff8866;box-shadow:0 0 14px #00ff8818,inset 0 0 6px #00ff8806;}
 .lob-input::placeholder{color:#163325;}
-.lob-input.code-input{text-transform:uppercase;font-size:22px;letter-spacing:6px;text-align:center;padding:10px 14px;width:min(260px,82vw);}
+.lob-input.code-input{text-transform:uppercase;font-size:22px;letter-spacing:8px;text-align:center;padding:10px 14px;}
 .ball-row{display:flex;gap:8px;}
 .b-opt{width:54px;height:64px;background:#020b05;border:1px solid #0d2218;cursor:pointer;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;transition:all .15s;}
@@ -153,19 +132,14 @@ canvas{
 </style>
 </head>
 <body>
+<div id="gameWrap">
 
 <!-- Firebase config warning (shown if placeholder URL still present) -->
 <div id="fbWarning">
   ⚠ Firebase not configured — replace YOUR-PROJECT in the databaseURL inside the &lt;script&gt; tag to enable multiplayer
 </div>
 
-<div id="canvasWrap"><canvas id="c"></canvas>
-
-<!-- Portrait mode warning -->
-<div id="portraitWarn">
-  <div class="pw-icon">📱</div>
-  <div class="pw-text">ROTATE YOUR PHONE<br>TO LANDSCAPE<br>FOR BEST EXPERIENCE</div>
-</div>
+<canvas id="c"></canvas>
 
 <!-- Mobile on-screen controls (shown only during gameplay on touch devices) -->
 <div id="mobileControls">
@@ -227,14 +201,15 @@ canvas{
     <div class="lob-sub">∙ JOIN A ROOM ∙</div>
     <div class="lob-sep"></div>
     <div class="lob-label">room code</div>
-    <input class="lob-input code-input" id="codeIn" maxlength="6" placeholder="XXXXXX" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" inputmode="text" type="text">
+    <input class="lob-input code-input" id="codeIn" maxlength="6" placeholder="XXXXXX" autocomplete="off" spellcheck="false">
     <div id="joinErr" class="lob-err"></div>
     <div class="btn-row">
       <button class="lob-btn" id="confirmJoinBtn">▶  JOIN</button>
       <button class="lob-btn danger" id="backToStep1Btn">← BACK</button>
     </div>
   </div>
-</div>
+</div><!-- /#mpLobby -->
+</div><!-- /#gameWrap -->
 
 <script>
 // ═══════════════════════════════════════════════════════════════
@@ -251,63 +226,12 @@ canvas{
 })();
 
 // ═══════════════════════════════════════════════════════════════
-//  CANVAS — fixed 860×520 internal, CSS-scaled to fill screen
+//  CANVAS
 // ═══════════════════════════════════════════════════════════════
 const canvas=document.getElementById('c');
 const ctx=canvas.getContext('2d');
-const W=canvas.width=860;   // always render at 860×520 internally
+const W=canvas.width=Math.min(window.innerWidth||860,860);
 const H=canvas.height=520;
-
-const canvasWrap=document.getElementById('canvasWrap');
-const portraitWarn=document.getElementById('portraitWarn');
-
-function resizeCanvas(){
-  const vw=window.innerWidth, vh=window.innerHeight;
-  const isPortrait=vw<vh;
-
-  // Show portrait warning on mobile; hide on desktop or landscape
-  const isMobile=vw<=900||('ontouchstart' in window);
-  if(isMobile&&isPortrait){
-    portraitWarn.style.display='flex';
-  } else {
-    portraitWarn.style.display='none';
-  }
-
-  // Scale canvas to fill available screen while keeping 860:520 ratio
-  const scaleX=vw/W, scaleY=vh/H;
-  const scale=Math.min(scaleX,scaleY);
-  const cssW=Math.floor(W*scale);
-  const cssH=Math.floor(H*scale);
-
-  // Set canvas CSS size (not internal resolution)
-  canvas.style.width=cssW+'px';
-  canvas.style.height=cssH+'px';
-
-  // Size the wrapper too so mobile controls sit over canvas
-  canvasWrap.style.width=cssW+'px';
-  canvasWrap.style.height=cssH+'px';
-  canvasWrap.style.position='relative';
-}
-resizeCanvas();
-window.addEventListener('resize',resizeCanvas);
-window.addEventListener('orientationchange',()=>{
-  // Short delay for browser to complete rotation
-  setTimeout(resizeCanvas,120);
-});
-
-// Try to lock orientation to landscape on mobile
-(function tryLockOrientation(){
-  try{
-    const scr=window.screen;
-    if(scr.orientation&&scr.orientation.lock){
-      scr.orientation.lock('landscape').catch(()=>{});
-    } else if(scr.lockOrientation){
-      scr.lockOrientation('landscape');
-    } else if(scr.mozLockOrientation){
-      scr.mozLockOrientation('landscape');
-    }
-  }catch(e){}
-})();
 
 let gameMode=null; // 'story' | 'multiplayer'
 
@@ -631,10 +555,10 @@ function startMpSyncs(){
   attachPosListener();
   // Push our own score every 2s
   if(scoreSyncTimer) clearInterval(scoreSyncTimer);
-  scoreSyncTimer=setInterval(()=>{if(state==='playing') pushScore(score,true);},3000);
+  scoreSyncTimer=setInterval(()=>{if(state==='playing') pushScore(score,lives>0);},2000);
   // Push our own position every 150ms for smooth ghost
   if(posSyncTimer) clearInterval(posSyncTimer);
-  posSyncTimer=setInterval(()=>{if(state==='playing'||state==='mpRespawn') pushPos();},300);
+  posSyncTimer=setInterval(()=>{if(state==='playing') pushPos();},120);
 }
 function stopMpSyncs(){
   detachScoresListener(); detachPosListener();
@@ -647,22 +571,13 @@ function stopMpSyncs(){
   }
 }
 
-let _lastScorePushed=-1,_lastAlivePushed=null;
 function pushScore(sc,alive){
   if(!mpPlayerName||!mpRoomCode) return;
-  if(sc===_lastScorePushed&&alive===_lastAlivePushed) return;
-  _lastScorePushed=sc; _lastAlivePushed=alive;
   fbScore(mpRoomCode,mpPlayerName).set({name:mpPlayerName,score:sc,alive,ball:mpBallId,ts:Date.now()});
 }
-let _lastPosX=-999,_lastPosY=-999,_lastPosTs=0;
 function pushPos(){
   if(!player||!mpRoomCode||!mpPlayerName) return;
-  const nx=Math.round(player.x),ny=Math.round(player.y),now=Date.now();
-  const moved=Math.abs(nx-_lastPosX)>2||Math.abs(ny-_lastPosY)>2;
-  const stale=now-_lastPosTs>900;
-  if(!moved&&!stale) return; // skip if barely moved and not stale
-  _lastPosX=nx;_lastPosY=ny;_lastPosTs=now;
-  fbPos(mpRoomCode,mpPlayerName).set({x:nx,y:ny,ballId:mpBallId,alive:lives>999?true:lives>0,ts:now});
+  fbPos(mpRoomCode,mpPlayerName).set({x:Math.round(player.x),y:Math.round(player.y),ballId:mpBallId,alive:lives>0,ts:Date.now()});
 }
 
 function attachScoresListener(){
@@ -684,11 +599,10 @@ function attachPosListener(){
   detachPosListener();
   if(!mpOtherName) return;
   posRef=fbPosOther(mpRoomCode,mpOtherName);
-  // 'value' is fine here — it's just one small object, fires only when opponent moves
   posListener=posRef.on('value',snap=>{
-    if(!snap.exists()){mpOtherPos=null;return;}
+    if(!snap.exists()) return;
     const d=snap.val();
-    if(d&&Date.now()-d.ts<4000) mpOtherPos=d;
+    if(d&&Date.now()-d.ts<3000) mpOtherPos=d;
     else mpOtherPos=null;
   });
 }
@@ -840,7 +754,6 @@ function startLevel(idx){
 function startMpGame(){
   state='playing'; score=0; lives=999; distance=0;
   mpMatchTimeLeft=mpMatchDuration; mpMatchResult=null;
-  _lastPosX=-999;_lastPosY=-999;_lastPosTs=0;_lastScorePushed=-1;_lastAlivePushed=null;
   modeIdx=0; bgTransition={alpha:1,from:0,to:0}; modeTimer=15;
   flashAlpha=0; shakeX=0; shakeY=0; announceT=0;
   particles=[]; shards=[]; powerups=[]; deactivatePowerup();
@@ -1114,8 +1027,25 @@ function drawBg(m){
   else fn(modeIdx,1);
 }
 
-function drawStarBg(){ctx.fillStyle='#030308';ctx.fillRect(0,0,W,H);for(const s of bgStars){ctx.fillStyle=`rgba(255,255,255,${s.a*.35})`;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill();}}
-function drawPlatforms(m){for(const p of platforms){const g=ctx.createLinearGradient(p.x,p.y,p.x,p.y+p.h);g.addColorStop(0,m.color+'cc');g.addColorStop(1,m.color+'33');ctx.fillStyle=g;rr(p.x,p.y,p.w,p.h,3);ctx.fill();}}
+// Pre-render static star background once into an offscreen canvas
+const _starCanvas = document.createElement('canvas');
+_starCanvas.width = W; _starCanvas.height = H;
+(function(){
+  const sc = _starCanvas.getContext('2d');
+  sc.fillStyle='#030308'; sc.fillRect(0,0,W,H);
+  for(const s of bgStars){
+    sc.fillStyle=`rgba(255,255,255,${s.a*.35})`;
+    sc.beginPath(); sc.arc(s.x,s.y,s.r,0,Math.PI*2); sc.fill();
+  }
+})();
+function drawStarBg(){ctx.drawImage(_starCanvas,0,0);}
+let _platGradCache={color:null,g0:null,g1:null};
+function drawPlatforms(m){
+  // Reuse gradient stops if color hasn't changed (avoid creating objects per platform per frame)
+  if(_platGradCache.color!==m.color){_platGradCache.color=m.color;_platGradCache.g0=m.color+'cc';_platGradCache.g1=m.color+'33';}
+  const c0=_platGradCache.g0,c1=_platGradCache.g1;
+  for(const p of platforms){const g=ctx.createLinearGradient(p.x,p.y,p.x,p.y+p.h);g.addColorStop(0,c0);g.addColorStop(1,c1);ctx.fillStyle=g;rr(p.x,p.y,p.w,p.h,3);ctx.fill();}
+}
 function drawPlayer(m){
   const ball=getBall(),col=ball.color||m.color,pw=ball.size,pr=pw/2,cx=player.x+pr,cy=player.y+pr;
   for(let i=0;i<player.trail.length;i++){const tp=player.trail[i],frac=i/player.trail.length,s=frac*pw*.7;ctx.fillStyle=col+Math.floor(frac*70).toString(16).padStart(2,'0');if(ball.shape==='circle'){ctx.beginPath();ctx.arc(tp.x,tp.y,s/2,0,Math.PI*2);ctx.fill();}else ctx.fillRect(tp.x-s/2,tp.y-s/2,s,s);}
@@ -1134,8 +1064,21 @@ function drawGhostPlayer(m){
   if(!mpOtherPos.alive){ctx.font='10px "Courier New"';ctx.fillStyle='#ff335580';ctx.fillText('✕',cx,mpOtherPos.y+bd.size+14);}
   ctx.globalAlpha=1;
 }
-function drawParticles(){for(const p of particles){ctx.globalAlpha=Math.max(0,p.life);ctx.fillStyle=p.col;ctx.fillRect(p.x,p.y,p.size,p.size);}ctx.globalAlpha=1;}
-function drawShards(){for(const s of shards){ctx.globalAlpha=Math.max(0,s.life);ctx.shadowBlur=s.life>.5?18:6;ctx.shadowColor=s.col;ctx.fillStyle=s.col+Math.floor(s.life*180).toString(16).padStart(2,'0');ctx.beginPath();ctx.moveTo(s.pts[0].x,s.pts[0].y);for(let i=1;i<s.pts.length;i++)ctx.lineTo(s.pts[i].x,s.pts[i].y);ctx.closePath();ctx.fill();ctx.shadowBlur=0;}ctx.globalAlpha=1;}
+function drawParticles(){for(const p of particles){if(p.x<-10||p.x>W+10||p.y<-10||p.y>H+10)continue;ctx.globalAlpha=Math.max(0,p.life);ctx.fillStyle=p.col;ctx.fillRect(p.x,p.y,p.size,p.size);}ctx.globalAlpha=1;}
+function drawShards(){
+  if(!shards.length) return;
+  // Set shadow once per draw pass, not per shard
+  ctx.shadowBlur=12; ctx.shadowColor='#ffffff44';
+  for(const s of shards){
+    ctx.globalAlpha=Math.max(0,s.life);
+    ctx.shadowColor=s.col;
+    ctx.fillStyle=s.col+Math.floor(s.life*180).toString(16).padStart(2,'0');
+    ctx.beginPath();ctx.moveTo(s.pts[0].x,s.pts[0].y);
+    for(let i=1;i<s.pts.length;i++)ctx.lineTo(s.pts[i].x,s.pts[i].y);
+    ctx.closePath();ctx.fill();
+  }
+  ctx.shadowBlur=0; ctx.globalAlpha=1;
+}
 function drawPowerups(){const t=performance.now()/1000;for(const pw of powerups){const def=POWERUP_DEFS[pw.type],bob=Math.sin(pw.bobT)*6,cx=pw.x,cy=pw.y+bob,pulse=1+.14*Math.sin(t*5);ctx.save();ctx.translate(cx,cy);ctx.rotate(pw.angle*.4);ctx.shadowBlur=22;ctx.shadowColor=def.color;ctx.strokeStyle=def.color;ctx.lineWidth=2;ctx.beginPath();for(let i=0;i<6;i++){const a=(i/6)*Math.PI*2,a2=((i+.5)/6)*Math.PI*2;i===0?ctx.moveTo(Math.cos(a)*22*pulse,Math.sin(a)*22*pulse):ctx.lineTo(Math.cos(a)*22*pulse,Math.sin(a)*22*pulse);ctx.lineTo(Math.cos(a2)*14*pulse,Math.sin(a2)*14*pulse);}ctx.closePath();ctx.stroke();const grd=ctx.createRadialGradient(0,-4,1,0,0,13);grd.addColorStop(0,'#ffffff');grd.addColorStop(.3,def.color);grd.addColorStop(1,def.bg||'#000022');ctx.fillStyle=grd;ctx.beginPath();ctx.moveTo(0,-13);ctx.lineTo(11,0);ctx.lineTo(0,13);ctx.lineTo(-11,0);ctx.closePath();ctx.fill();ctx.shadowBlur=0;ctx.font='bold 11px "Courier New"';ctx.textAlign='center';ctx.fillStyle='#ffffff';ctx.fillText(def.icon,0,4);ctx.restore();}}
 function drawCoinIcon(cx,cy,r,alpha=1){if(r<1)return;ctx.save();ctx.globalAlpha=alpha;ctx.shadowBlur=12;ctx.shadowColor='#ffcc00';ctx.strokeStyle='#ffcc00';ctx.lineWidth=2;ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();const g=ctx.createRadialGradient(cx-r*.3,cy-r*.3,1,cx,cy,r);g.addColorStop(0,'#ffe066');g.addColorStop(.6,'#ffaa00');g.addColorStop(1,'#cc7700');ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,r-1,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.restore();}
 function drawStarsRow(cx,cy,count,earned,size=22){const gap=size+6,startX=cx-(count-1)*gap/2;for(let i=0;i<count;i++){const filled=i<earned,x=startX+i*gap;ctx.save();ctx.shadowBlur=filled?14:0;ctx.shadowColor='#ffcc00';ctx.fillStyle=filled?'#ffcc00':'#333344';ctx.strokeStyle=filled?'#ffaa00':'#444455';ctx.lineWidth=1.5;ctx.beginPath();for(let p=0;p<5;p++){const a1=(p*2*Math.PI/5)-Math.PI/2,a2=((p+.5)*2*Math.PI/5)-Math.PI/2;ctx[p===0?'moveTo':'lineTo'](x+Math.cos(a1)*size/2,cy+Math.sin(a1)*size/2);ctx.lineTo(x+Math.cos(a2)*size/4,cy+Math.sin(a2)*size/4);}ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();}}
@@ -1363,6 +1306,8 @@ canvas.addEventListener('mousemove',e=>{
   if(state==='shop'){for(let i=0;i<BALLS.length;i++){const c=shopCardRect(i);if(mx>=c.x&&mx<=c.x+SH_GW&&my>=c.y&&my<=c.y+SH_GH){hoveredShopCard=i;break;}}}
 });
 window.addEventListener('keydown',e=>{
+  // Don't intercept keypresses when the user is typing in an input / textarea
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
   keys[e.code]=true;
   if(['Space','ArrowUp','KeyW'].includes(e.code)){
     if(state==='playing') tryJump();
@@ -1379,10 +1324,13 @@ window.addEventListener('keydown',e=>{
     if(state==='playing'||state==='dead'){stopMusic();if(gameMode==='multiplayer')stopMpSyncs();state='modeSelect';}
     else if(state==='levelSelect'||state==='menu') state='modeSelect';
     else if(state==='rewards'||state==='shop') state='levelSelect';
-    else if(state==='mpWaiting'){detachRoomListener();if(mpRoomCode)fbRoom(mpRoomCode).update({status:'abandoned'}).catch(()=>{});mpRoomCode='';state='modeSelect';}
+    else if(state==='mpWaiting'){detachRoomListener();if(mpRoomCode)fbRoom(mpRoomCode).update({status:'abandoned'}).catch(()=>{});mpRoomCode='';mpRole=null;mpOtherName='';gameMode=null;state='modeSelect';}
   }
 });
-window.addEventListener('keyup',e=>{keys[e.code]=false;});
+window.addEventListener('keyup',e=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
+  keys[e.code]=false;
+});
 canvas.addEventListener('click',e=>{
   const r=canvas.getBoundingClientRect();const mx=(e.clientX-r.left)*(W/r.width),my=(e.clientY-r.top)*(H/r.height);
   if(state==='modeSelect'){
@@ -1418,9 +1366,7 @@ function handleShopClick(mx,my){
 }
 let touchSX=0;
 canvas.addEventListener('touchstart',e=>{
-  touchSX=e.touches[0].clientX;
-  const r=canvas.getBoundingClientRect();
-  const mx=(e.touches[0].clientX-r.left)*(W/r.width),my=(e.touches[0].clientY-r.top)*(H/r.height);
+  touchSX=e.touches[0].clientX;const r=canvas.getBoundingClientRect();const mx=(e.touches[0].clientX-r.left)*(W/r.width),my=(e.touches[0].clientY-r.top)*(H/r.height);
   if(state==='modeSelect'){if(mx>=W/2-230&&mx<=W/2-30&&my>=H/2-50&&my<=H/2+60){gameMode='story';state='menu';}else if(mx>=W/2+30&&mx<=W/2+230&&my>=H/2-50&&my<=H/2+60){gameMode='multiplayer';document.getElementById('mpLobby').style.display='flex';showStep('step1');}return;}
   if(state==='menu'){state='levelSelect';return;}
   if(state==='gameover'){state=gameMode==='story'?'levelSelect':'modeSelect';return;}
@@ -1443,12 +1389,12 @@ const btnRight=document.getElementById('btnRight');
 const btnJump=document.getElementById('btnJump');
 
 // Show controls only on touch devices during gameplay
+let _lastMCVisible = null;
 function updateMobileControls(){
-  if(isTouchDevice()&&state==='playing'){
-    mcDiv.style.display='flex';
-  }else{
-    mcDiv.style.display='none';
-  }
+  const shouldShow = isTouchDevice() && state==='playing';
+  if(shouldShow === _lastMCVisible) return; // no DOM write unless changed
+  _lastMCVisible = shouldShow;
+  mcDiv.style.display = shouldShow ? 'flex' : 'none';
 }
 
 // Left button
@@ -1502,14 +1448,7 @@ document.getElementById('backFromLobby').addEventListener('click',()=>{
   mpRoomCode='';mpRole=null;mpOtherName='';
   document.getElementById('mpLobby').style.display='none'; state='modeSelect'; gameMode=null;
 });
-document.getElementById('codeIn').addEventListener('input',e=>{
-  const el=e.target, pos=el.selectionStart;
-  el.value=el.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6);
-  try{el.setSelectionRange(pos,pos);}catch(x){}
-  // Show how many chars entered
-  const n=el.value.length;
-  document.getElementById('joinErr').textContent=n>0&&n<6?`${n}/6 — need ${6-n} more`:'';
-});
+document.getElementById('codeIn').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'');});
 document.getElementById('codeIn').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('confirmJoinBtn').click();});
 document.getElementById('confirmJoinBtn').addEventListener('click',()=>{
   const code=document.getElementById('codeIn').value.trim();
@@ -1531,6 +1470,8 @@ function loop(ts){
   if(dt<FRAME_MS-2)return;
   lastTime=ts;
   update(Math.min(dt,50));
+  // Reset critical canvas state at frame start to prevent state leaking between frames
+  ctx.shadowBlur=0; ctx.globalAlpha=1; ctx.textAlign='left';
   const m=MODES[modeIdx];
   const sx=shakeX>0?(Math.random()-.5)*shakeX*2:0, sy=shakeY>0?(Math.random()-.5)*shakeY*2:0;
   ctx.save(); ctx.translate(sx,sy);
