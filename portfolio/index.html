@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Gaurang Agarwal's engineering portfolio: materials fabrication, physical systems, simulation and computational tools.">
+  <title>Gaurang Agarwal — Materials & Computation</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <script src="assets/portfolio.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#projects">Skip to projects</a>
+<header class="nav wrap">
+  <a class="identity" href="#"><span class="monogram">GA</span> GAURANG AGARWAL</a>
+  <nav aria-label="Main navigation"><a href="#projects">Projects</a><a href="#approach">Approach</a><a href="https://github.com/gaurangagarwal351/PHYSICSSS">GitHub ↗</a></nav>
+</header>
+<main>
+<section class="hero wrap">
+  <div class="hero-copy">
+    <p class="eyebrow"><span class="dot"></span> MATERIALS ENGINEERING · IIT DELHI</p>
+    <h1>From physical materials<br>to <em>working systems.</em></h1>
+    <p class="intro">I’m Gaurang, an undergraduate exploring materials fabrication, experimental systems, and the computational tools that help us understand them.</p>
+    <div class="actions"><a class="button" href="#projects">Explore the projects <span>↓</span></a><a class="text-link" href="mailto:ms1251072@mse.iitd.ac.in">Get in touch ↗</a></div>
+    <div class="hero-note"><span>RESEARCH INTEREST</span>Materials processing · Device fabrication · Quantitative analysis</div>
+  </div>
+  <figure class="specimen">
+    <div class="specimen-top"><span>01 / MATERIALS → RESPONSE</span><span class="live-dot">●</span></div>
+    <svg viewBox="0 0 400 300" role="img" aria-labelledby="mesh-title mesh-desc">
+      <title id="mesh-title">Conceptual mesh-to-response illustration</title><desc id="mesh-desc">A tilted grid representing a mesh over glass, with a conceptual binary response below. This is an illustration, not microscopy or data.</desc>
+      <defs><pattern id="grid" width="22" height="22" patternUnits="userSpaceOnUse"><path d="M22 0H0V22" fill="none" stroke="#92b7ac" stroke-width="1.4"/></pattern></defs>
+      <g transform="translate(80 48) rotate(-12 110 90)"><rect x="10" y="17" width="230" height="180" rx="3" fill="#bed5ca" opacity=".2"/><rect width="230" height="180" rx="3" fill="#163f39" stroke="#7ca699"/><rect width="230" height="180" fill="url(#grid)"/><path d="M30 32L58 93 109 78 151 135 205 110" stroke="#e2c586" stroke-width="2" fill="none"/><g fill="#e2c586"><circle cx="30" cy="32" r="4"/><circle cx="58" cy="93" r="4"/><circle cx="109" cy="78" r="4"/><circle cx="151" cy="135" r="4"/><circle cx="205" cy="110" r="4"/></g></g>
+      <path d="M202 242v20" stroke="#92b7ac" stroke-dasharray="3 4"/><text x="200" y="287" fill="#e2c586" font-size="17" font-family="monospace" text-anchor="middle" letter-spacing="5">0 1 0 0 1 1 0 1</text>
+    </svg>
+    <figcaption>Aluminium-mesh PUF<span>Concept illustration · not experimental data</span></figcaption>
+  </figure>
+</section>
+<div class="discipline-strip"><div class="wrap"><span>FABRICATION</span><span>PHYSICAL SYSTEMS</span><span>SIMULATION</span><span>ALGORITHMS</span></div></div>
+<section id="projects" class="wrap projects-section">
+  <div class="section-top"><div><p class="eyebrow">SELECTED WORK</p><h2>Six projects. Different ways<br>to investigate a system.</h2></div><p>Methods, source code, assumptions,<br>and runnable examples in one place.</p></div>
+  <div class="filters" role="group" aria-label="Filter projects">
+    <button type="button" data-filter="all" aria-pressed="true">All projects <span>06</span></button>
+    <button type="button" data-filter="materials" aria-pressed="false">Materials</button>
+    <button type="button" data-filter="hardware" aria-pressed="false">Physical systems</button>
+    <button type="button" data-filter="computing" aria-pressed="false">Computation</button>
+  </div>
+  <p class="sr-only" id="filter-status" aria-live="polite">Showing all 6 projects.</p>
+  <div class="project-grid">
+    <article class="card featured" data-category="materials computing">
+      <div class="card-top"><span class="number">01</span><span class="tag">MATERIALS / FABRICATION</span></div>
+      <h3>Aluminium-Mesh PUF</h3><p>Fabrication of an aluminium-mesh/glass device for physical authentication. Supporting analysis explores response repeatability and device differences.</p>
+      <ul class="chips"><li>Spin coating</li><li>Photolithography</li><li>Python analysis</li></ul>
+      <div class="artifact">Project notes + response analysis tool<span>Synthetic example data</span></div>
+      <a href="https://github.com/gaurangagarwal351/PHYSICSSS/tree/main/projects/aluminium_puf">Explore fabrication & analysis <span>↗</span></a>
+    </article>
+    <article class="card" data-category="hardware">
+      <div class="card-top"><span class="number">02</span><span class="tag">ENERGY / CONTROL</span></div>
+      <h3>Sun-Tracking Solar Panels</h3><p>Photoresistors, motors, and feedback to orient a panel toward sunlight. A supporting model makes the control assumptions explicit.</p>
+      <ul class="chips"><li>Sensor feedback</li><li>Microcontrollers</li><li>Simulation</li></ul>
+      <div class="artifact">Project notes + one-axis tracking model<span>Idealized simulation</span></div>
+      <a href="https://github.com/gaurangagarwal351/PHYSICSSS/tree/main/projects/solar_tracker">Explore the tracking model <span>↗</span></a>
+    </article>
+    <article class="card" data-category="hardware">
+      <div class="card-top"><span class="number">03</span><span class="tag">ELECTRONICS / TIMING</span></div>
+      <h3>Motor Speed Controller</h3><p>A 555-timer-based pulsed supply for a DC motor. A companion calculator connects component values with pulse timing and duty cycle.</p>
+      <ul class="chips"><li>555 timer</li><li>DC motors</li><li>Pulse timing</li></ul>
+      <div class="artifact">Project notes + astable timing calculator<span>Ideal circuit equations</span></div>
+      <a href="https://github.com/gaurangagarwal351/PHYSICSSS/tree/main/projects/motor_controller">Explore the timing analysis <span>↗</span></a>
+    </article>
+    <article class="card" data-category="computing">
+      <div class="card-top"><span class="number">04</span><span class="tag">INTERACTIVE / PHYSICS</span></div>
+      <h3>PHYSICSSS</h3><p>A playable 2D platformer with changing gravity, friction, platform collisions, and multiplayer. Inspect the mechanics or try the existing game.</p>
+      <ul class="chips"><li>JavaScript</li><li>HTML5 Canvas</li><li>Firebase</li></ul>
+      <div class="artifact">Existing game source + implementation notes<span>Game mechanics, not a calibrated solver</span></div>
+      <div class="dual-links"><a href="../index.html">Play the game ↗</a><a href="https://github.com/gaurangagarwal351/PHYSICSSS/tree/main/projects/physicsss">Read the code ↗</a></div>
+    </article>
+    <article class="card" data-category="computing">
+      <div class="card-top"><span class="number">05</span><span class="tag">SYSTEMS / DATA STRUCTURES</span></div>
+      <h3>Stock Order Matching Engine</h3><p>A limit-order-book reference implementation with price-time priority, partial fills, maker-price execution, and cancellation.</p>
+      <ul class="chips"><li>C++17</li><li>Ordered maps</li><li>FIFO queues</li></ul>
+      <div class="artifact">New reference implementation + tests<span>Deterministic synthetic order stream</span></div>
+      <a href="https://github.com/gaurangagarwal351/PHYSICSSS/tree/main/projects/order_matching">Explore the matching engine <span>↗</span></a>
+    </article>
+    <article class="card" data-category="computing">
+      <div class="card-top"><span class="number">06</span><span class="tag">ALGORITHMS / OPTIMIZATION</span></div>
+      <h3>Intelligent Flight Planning</h3><p>Graph-based routing with three objectives: lowest cost, fewest flights, or lowest cost among routes with the fewest flights.</p>
+      <ul class="chips"><li>Python</li><li>Shortest paths</li><li>Lexicographic costs</li></ul>
+      <div class="artifact">New reference implementation + tests<span>Synthetic graph · no live schedules</span></div>
+      <a href="https://github.com/gaurangagarwal351/PHYSICSSS/tree/main/projects/flight_planning">Explore the route planner <span>↗</span></a>
+    </article>
+  </div>
+</section>
+<section id="approach" class="approach wrap">
+  <div><p class="eyebrow">HOW TO READ THIS PORTFOLIO</p><h2>Make the method<br><em>inspectable.</em></h2></div>
+  <div class="principles"><div><span>01 / CONTEXT</span><p>Each project explains the problem, its methods, and its connection to the broader engineering work.</p></div><div><span>02 / REPRODUCIBILITY</span><p>Run the supporting tools locally, inspect the input data, and check the implementation against tests.</p></div><div><span>03 / EVIDENCE</span><p>Existing work, new supporting code, and synthetic examples are identified separately. Lab measurements are not inferred from simulations.</p></div></div>
+</section>
+<section class="contact wrap"><div><p class="eyebrow">LET’S TALK RESEARCH</p><h2>Interested in materials,<br>devices, and good questions.</h2></div><a class="button" href="mailto:ms1251072@mse.iitd.ac.in">ms1251072@mse.iitd.ac.in ↗</a></section>
+</main>
+<footer class="wrap"><span>Gaurang Agarwal · IIT Delhi</span><a href="https://github.com/gaurangagarwal351/PHYSICSSS/blob/main/docs/PROVENANCE.md">Artifact provenance & AI assistance ↗</a></footer>
+</body>
+</html>

@@ -1,0 +1,7 @@
+[
+  {"id":"direct", "origin":"A", "destination":"D", "cost":50000},
+  {"id":"ab", "origin":"A", "destination":"B", "cost":8000},
+  {"id":"bd", "origin":"B", "destination":"D", "cost":9000},
+  {"id":"ac", "origin":"A", "destination":"C", "cost":10000},
+  {"id":"cd", "origin":"C", "destination":"D", "cost":11000}
+]

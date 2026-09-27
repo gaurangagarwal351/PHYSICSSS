@@ -1,0 +1,7 @@
+device,challenge,trial,response
+synthetic_A,challenge_1,01,00110011
+synthetic_A,challenge_1,02,00110010
+synthetic_B,challenge_1,01,01010101
+synthetic_B,challenge_1,02,01010101
+synthetic_C,challenge_1,01,11001100
+synthetic_C,challenge_1,02,11001101
