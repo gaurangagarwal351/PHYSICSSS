@@ -2,6 +2,8 @@
 
 I am Gaurang Agarwal, an undergraduate in Materials Engineering at IIT Delhi. This repository contains the source for [PHYSICSSS](https://gaurangagarwal351.github.io/PHYSICSSS/), a browser game I worked on, and technical reports on five other projects from my CV.
 
+**New computational project:** [Thin-film diffusion](https://github.com/gaurangagarwal351/thin-film-diffusion) has Python source, a model schematic, simulated concentration profiles, and analytical verification in its own repository. Its methods, development, and data origin are documented there.
+
 | Project | What is here |
 | --- | --- |
 | [PHYSICSSS](projects/physicsss/README.md) | The game source is at the repository root. |
