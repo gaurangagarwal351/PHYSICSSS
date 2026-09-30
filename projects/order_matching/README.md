@@ -6,7 +6,7 @@
 
 ## My work
 
-I worked on a C++ limit-order-book project covering order placement, cancellation, and matching by price and arrival time. The original program is not available in this repository, so this report does not claim a specific data structure, input format, or measured throughput.
+I worked on a C++ limit-order-book project covering order placement, cancellation, and matching by price and arrival time. My supplied CV describes doubly linked lists and maps for managing active orders. The original program is not available here, so this report does not claim verified complexity bounds or measured throughput.
 
 ## Problem
 
