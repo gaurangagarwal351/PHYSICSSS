@@ -4,9 +4,13 @@
 
 **Evidence available:** project description. Original C++ source, tests, and benchmark results are not uploaded.
 
+## My work
+
+I worked on a C++ limit-order-book project covering order placement, cancellation, and matching by price and arrival time. The original program is not available in this repository, so this report does not claim a specific data structure, input format, or measured throughput.
+
 ## Problem
 
-A limit-order book stores buy and sell instructions and decides which orders can trade when a new order arrives. The reported C++ project covered order placement, cancellation, and matching by price and arrival time. The available summary does not preserve the exact data structures, input format, or exchange-rule choices.
+A limit-order book stores buy and sell instructions and decides which orders can trade when a new order arrives. The available summary does not preserve the exact exchange-rule choices.
 
 ## Matching rule in context
 

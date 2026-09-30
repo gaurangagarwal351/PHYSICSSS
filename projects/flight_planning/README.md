@@ -4,9 +4,13 @@
 
 **Evidence available:** project description. Original program, flight data, and test cases are not uploaded.
 
+## My work
+
+I worked on a graph-based route-planning project comparing possible routes by number of flights and total cost. The original program is not available in this repository, so I have not attributed a particular algorithm or dataset to it.
+
 ## Problem
 
-Flight connections can be represented as a graph: airports are vertices, and available flights are edges. The project summary says the route-planning work compared routes by flight count and cost. It does not preserve the original programming language, graph representation, data source, or exact algorithm selection.
+Flight connections can be represented as a graph: airports are vertices, and available flights are edges. The project summary does not preserve the original programming language, graph representation, data source, or exact algorithm selection.
 
 ## Why the objective matters
 

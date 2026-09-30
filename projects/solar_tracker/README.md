@@ -4,9 +4,13 @@
 
 **Evidence available:** project description. Original wiring, firmware, photographs, and power measurements are not uploaded.
 
+## My work
+
+I designed and built a sun-tracking panel prototype using photoresistors, a microcontroller, and motors to adjust its orientation in response to sunlight. The component types and aim come from my project summary; the exact wiring and control program are not available here.
+
 ## Engineering question
 
-Can a sensor-controlled mount keep a photovoltaic panel oriented toward brighter sunlight? The recorded project used photoresistors, a microcontroller, and motors to adjust panel position. It was a controls and instrumentation project; the photovoltaic material itself was not synthesised or characterised.
+Can a sensor-controlled mount keep a photovoltaic panel oriented toward brighter sunlight? This was a controls and instrumentation project; the photovoltaic material itself was not synthesised or characterised.
 
 ## System concept
 

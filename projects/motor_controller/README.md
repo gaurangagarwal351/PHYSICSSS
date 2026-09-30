@@ -4,9 +4,13 @@
 
 **Evidence available:** project description. Original schematic, component values, oscilloscope traces, and speed measurements are not uploaded.
 
+## My work
+
+I used a 555 timer to generate pulses for controlling a 12 V, 0.5 A permanent-magnet DC motor. My project summary also lists a 2N2222 transistor and a diode in the power circuit. It does not preserve the circuit diagram or component values.
+
 ## Engineering question
 
-How can a pulsed electrical supply vary the speed of a small permanent-magnet DC motor? The project summary specifies a 12 V, 0.5 A motor, a 555 timer, a 2N2222 transistor, and a diode. The timer produced pulses and the transistor formed part of the motor power-control circuit.
+How can a pulsed electrical supply vary the speed of a small permanent-magnet DC motor? This project investigated that question with a timer-based pulse circuit.
 
 ## Operating principle
 

@@ -4,9 +4,13 @@
 
 **Evidence available:** project description. Original device images, process logs, response data, and analysis code are not uploaded.
 
+## My work
+
+I fabricated an aluminium-mesh/glass PUF using spin coating, aluminium deposition, and photolithography. I then explored image-based authentication and analysed the response for randomness. These are the activities recorded in my project summary; the process parameters and measurements are not available here.
+
 ## Research question
 
-Can fabrication variation in an aluminium-mesh structure on glass produce a repeatable optical pattern that distinguishes one device from another? A physical unclonable function (PUF) uses a physical response as a device identity. This project combined an aluminium-mesh/glass device with an image-based authentication protocol and explored random-bit generation.
+Can fabrication variation in an aluminium-mesh structure on glass produce a repeatable optical pattern that distinguishes one device from another? A physical unclonable function (PUF) uses a physical response as a device identity. The project also considered whether its image-derived responses could be used for random-bit generation.
 
 ## Work described in the project record
 
