@@ -1,68 +1,18 @@
-# Gaurang Agarwal · Research & Engineering Portfolio
+# PHYSICSSS and project notes
 
-**Materials Engineering · Indian Institute of Technology Delhi**
+I am Gaurang Agarwal, an undergraduate in Materials Engineering at IIT Delhi. This repository contains the source for [PHYSICSSS](https://gaurangagarwal351.github.io/PHYSICSSS/), a browser game I worked on, and short notes on five other projects from my CV.
 
-Materials fabrication, physical systems, and computational tools. This repository brings together six projects, with the aluminium-mesh PUF first for materials research readers.
+| Project | What is here |
+| --- | --- |
+| [PHYSICSSS](projects/physicsss/README.md) | The game source is at the repository root. |
+| [Aluminium-mesh PUF](projects/aluminium_puf/README.md) | A summary of the fabrication and authentication project. |
+| [Sun-tracking solar panel](projects/solar_tracker/README.md) | A summary of the sensor and motor setup. |
+| [Motor speed controller](projects/motor_controller/README.md) | A summary of the 555-timer circuit. |
+| [Stock order matching engine](projects/order_matching/README.md) | A description of the C++ project. |
+| [Flight planning](projects/flight_planning/README.md) | A description of the graph-algorithm project. |
 
-**[Browse the portfolio](https://gaurangagarwal351.github.io/PHYSICSSS/portfolio/)** · **[Play PHYSICSSS](https://gaurangagarwal351.github.io/PHYSICSSS/)** · **[Email](mailto:ms1251072@mse.iitd.ac.in)**
+Only PHYSICSSS has its project source here. I have not uploaded original lab records, firmware, or source files for the other projects. The notes explain what I worked on; they do not provide independent evidence for numerical performance claims.
 
-> The portfolio URL is served at `/portfolio/` when GitHub Pages publishes this repository's root. Project pages below work directly on GitHub regardless of Pages settings.
+Earlier versions of this repository included a portfolio site, synthetic data, and AI-assisted example code created after the projects. I removed those files because they were not original project artifacts. The [provenance note](docs/PROVENANCE.md) records what was removed and what remains.
 
-## Project index
-
-| Project | Focus | What you can inspect here |
-| --- | --- | --- |
-| [Aluminium-mesh PUF](projects/aluminium_puf/README.md) | Fabrication, physical authentication | Fabrication summary; new binary-response analysis utility and labelled synthetic data |
-| [Sun-tracking solar panels](projects/solar_tracker/README.md) | Sensors, feedback, solar instrumentation | Project summary; new one-axis feedback model |
-| [Motor speed controller](projects/motor_controller/README.md) | 555-timer timing, motor electronics | Project summary; new astable timing calculator |
-| [PHYSICSSS](projects/physicsss/README.md) | Interactive physics, JavaScript, Canvas | Existing game source and implementation notes |
-| [Stock order matching engine](projects/order_matching/README.md) | C++, data structures, deterministic systems | New reference implementation of price-time matching, cancellation, and partial fills |
-| [Intelligent flight planning](projects/flight_planning/README.md) | Python, graph algorithms | New reference implementation with three routing objectives |
-
-## Start with the evidence
-
-The original PHYSICSSS game was already present in this repository. The three hardware-project descriptions come from my project summaries; their original lab records, images, schematics, and firmware are not included yet. The order-book and route-planner code here are newly written reference implementations of the described projects, not recovered original submissions.
-
-The supporting utilities were prepared with AI assistance for this portfolio. Their tests exercise the new implementations. Example data are synthetic and do not demonstrate experimental performance. See [artifact provenance](docs/PROVENANCE.md) for the distinction between reported project work and supplied artifacts.
-
-## Run locally
-
-Python 3.10+ and a C++17 compiler are sufficient. The Python tools use only the standard library.
-
-```sh
-# From the repository root:
-python3 -m http.server 8000
-# Open http://localhost:8000/portfolio/ for the portfolio.
-# Open http://localhost:8000/ for the original game.
-```
-
-Run the numerical examples, Python tests, C++ tests, and link checks:
-
-```sh
-bash scripts/check.sh
-# Optional UI logic check if Node.js is installed:
-node tests/portfolio_test.js
-```
-
-Individual commands and assumptions are documented in each project's README. Outputs written by the check script go to `build/` and are excluded from version control.
-
-## Repository map
-
-```text
-index.html                   Existing PHYSICSSS game entry point
-input.js / levels.js / ...   Existing companion game files
-portfolio/                   Responsive research portfolio landing page
-projects/                    Six project pages and supporting implementations
-docs/                        Evidence guide and artifact provenance
-scripts/                     Reproducibility and local-link checks
-tests/                       Python and C++ correctness tests
-.github/workflows/verify.yml Automated checks on pushes and pull requests
-```
-
-## Research context
-
-My most directly relevant materials experience is aluminium-mesh/glass device fabrication using spin coating, aluminium deposition, and photolithography. I am interested in building on this experience through research involving materials processing, device fabrication, and quantitative analysis.
-
-Contact: **Gaurang Agarwal** · [ms1251072@mse.iitd.ac.in](mailto:ms1251072@mse.iitd.ac.in)
-
-The existing game uses externally hosted Firebase libraries and a configured Realtime Database for multiplayer. The portfolio and command-line examples work independently of that service.
+To run PHYSICSSS locally, open `index.html` in a browser or serve the repository with `python3 -m http.server 8000` and visit `http://localhost:8000/`. The multiplayer feature uses Firebase and needs network access and a working database configuration.

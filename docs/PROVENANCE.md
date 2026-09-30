@@ -1,23 +1,14 @@
-# Artifact provenance
+# What this repository contains
 
-This repository is intended to make the boundary between project descriptions and inspectable evidence clear.
+| Project | Current evidence in this repository |
+| --- | --- |
+| PHYSICSSS | HTML and JavaScript game source at the root. The game predates the portfolio additions. |
+| Aluminium-mesh PUF | Project description only. Original fabrication records, device images, measurements, and analysis code are not uploaded. |
+| Sun-tracking solar panel | Project description only. Original wiring, firmware, and measurements are not uploaded. |
+| Motor speed controller | Project description only. Original schematic and measurements are not uploaded. |
+| Stock order matching engine | Project description only. The original C++ submission is not uploaded. |
+| Flight planning | Project description only. The original source is not uploaded. |
 
-| Artifact | Origin | What it establishes |
-| --- | --- | --- |
-| Root game HTML and JavaScript | Existing repository, baseline commit `8277a10` | Inspectable JavaScript/Canvas game implementation |
-| Aluminium-mesh, solar-tracker and motor-controller descriptions | Project summaries provided by Gaurang | Reported project scope and supervisors; not independent verification of experimental results |
-| PUF analyzer, solar model and 555 calculator | Newly prepared with AI assistance | Runnable supporting examples and tested numerical logic |
-| Order book and route planner | Newly prepared with AI assistance from CV descriptions | Reference implementations; not original course submissions |
-| CSV/JSON examples | Manually constructed synthetic data | Reproducibility and edge-case demonstration only |
-| Portfolio website and documentation | Newly prepared with AI assistance | Organization and explanation of the artifacts above |
+The portfolio site and supporting code added in an earlier revision were prepared with AI assistance from project descriptions. Their example inputs were synthetic. They were removed from the current version because they could be mistaken for original project evidence. They remain visible in Git history; this note is meant to make that history understandable, not erase it.
 
-No laboratory photos, microscopy, fabrication recipes, original hardware firmware, original order-book/flight-planner code or experimental datasets were supplied. No substitute results are presented as measurements. No ML project is claimed solely from a machine-learning course certificate or the use of computer vision.
-
-## CV consistency notes
-
-- PHYSICSSS in this repository uses JavaScript, not Python. Update its language in future CV versions unless a separate original Python implementation can be supplied.
-- Describe collision handling as AABB platform collisions; this is not a general rigid-body engine.
-- The new order-book cancellation is not strictly `O(1)` overall.
-- The PUF “80% uniqueness on the NIST test” and solar “40% efficiency improvement” statements require original metric definitions and evidence before reuse.
-
-Do not label the new reference implementations as the historical project source. When original materials become available, preserve their origin and explain how they relate to these examples.
+I should not use the synthetic examples to support claims about device uniqueness, solar-panel efficiency, motor speed, or the performance of my original algorithms. Those claims need the original methods and data.

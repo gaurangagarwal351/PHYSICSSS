@@ -1,7 +1,0 @@
-# Synthetic example: price-time matching, partial fill, cancellation.
-ADD s1 SELL 100 5
-ADD s2 SELL 100 4
-ADD b1 BUY 101 7
-COUNT
-CANCEL s2
-COUNT
